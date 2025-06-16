@@ -49,35 +49,11 @@ def run(playwright: Playwright) -> None:
     page.get_by_role("textbox", name="Password").fill(github_password)
     page.get_by_role("button", name="Sign in", exact=True).click()
     page.goto("https://github.com/marketplace/models/azure-openai/gpt-4-1/playground")
-    
-    # Wait for the page to be fully loaded
-    page.wait_for_load_state("networkidle")
-    
-    try:
-        # Try to find and fill the max tokens input - using a more reliable selector
-        max_tokens_input = page.locator('input[type="range"]').first
-        if max_tokens_input:
-            max_tokens_input.fill("32768")
-        else:
-            print("Max tokens input not found, continuing with default value")
-    except Exception as e:
-        print(f"Warning: Could not set max tokens: {str(e)}")
-    
-    # Wait for the prompt input to be available
-    prompt_input = page.get_by_role("textbox", name="Prompt", exact=True)
-    prompt_input.wait_for(state="visible", timeout=10000)
-    prompt_input.click()
-    prompt_input.fill(prompt)
-    
-    # Wait for and click the send button
-    send_button = page.get_by_role("button", name="Send now")
-    send_button.wait_for(state="visible", timeout=10000)
-    send_button.click()
-    
-    # Wait for response and copy button
-    copy_button = page.get_by_role("button", name="Copy to clipboard")
-    copy_button.wait_for(state="visible", timeout=30000)  # Increased timeout for response
-    copy_button.click()
+    page.get_by_role("slider", name="Max Completion Tokens slider").fill("32768")
+    page.get_by_role("textbox", name="Prompt", exact=True).click()
+    page.get_by_role("textbox", name="Prompt", exact=True).fill(prompt)
+    page.get_by_role("button", name="Send now").click()
+    page.get_by_role("button", name="Copy to clipboard").click()
 
     # Get clipboard content
     copied_content = get_clipboard_content()
