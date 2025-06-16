@@ -73,7 +73,9 @@ def run(playwright: Playwright) -> None:
     page.goto("https://github.com/marketplace/models/azure-openai/gpt-4-1/playground")
     
     logger.info("Setting up GPT-4 parameters")
-    page.get_by_role("slider", name="Max Completion Tokens slider").fill("32768")
+    page.get_by_role("spinbutton", name="Max Completion Tokens").click()
+    page.get_by_role("spinbutton", name="Max Completion Tokens").press("ControlOrMeta+a")
+    page.get_by_role("spinbutton", name="Max Completion Tokens").fill("32768")
     page.get_by_role("textbox", name="Prompt", exact=True).click()
     page.get_by_role("textbox", name="Prompt", exact=True).fill(prompt)
     
