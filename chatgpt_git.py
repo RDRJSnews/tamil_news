@@ -29,7 +29,7 @@ Requirements and rules:
 9. Always the last line will be 'இது போல தினசரி செய்திகள் தெரிந்துகொள்ள like, share, subscribe மற்றும் comment செய்யுங்கள்.'
 10. Do not use any other text or comments before or after the news summaries.
 11. Generate more than 20+ important and priority news.
-12. Generate each word properly, fully and correctly do not use something like �, ��.
+12. Generate each word properly, fully and correctly do not use something like �, ��, ..etc.
 
 Please proceed with generating the news summaries."""
 
