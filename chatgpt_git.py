@@ -75,19 +75,28 @@ def run(playwright: Playwright) -> None:
     logger.info("Setting up GPT-4 parameters")
     try:
         # Wait for the max tokens input to be visible and ready
+        print("1\n")
         max_tokens_input = page.locator("input[name='max_completion_tokens']")
+        print("2\n")
         max_tokens_input.wait_for(state="visible", timeout=60000)  # Increased timeout to 60 seconds
 
         # Click and fill the input field
+        print("3\n")
         max_tokens_input.click(timeout=30000)
+        print("4\n")
         max_tokens_input.press("ControlOrMeta+a")
+        print("5\n")
         max_tokens_input.fill("7000")
         
         logger.info("Filling Prompt")
         # Wait for and fill the prompt textbox
+        print("6\n")
         prompt_textbox = page.get_by_role("textbox", name="Prompt", exact=True)
+        print("7\n")
         prompt_textbox.wait_for(state="visible", timeout=30000)
+        print("8\n")
         prompt_textbox.click()
+        print("9\n")
         prompt_textbox.fill(prompt)
         
         logger.info("Sending prompt to GPT-4")
@@ -95,7 +104,9 @@ def run(playwright: Playwright) -> None:
         
         logger.info("Waiting for response and copying")
         copy_button = page.get_by_role("button", name="Copy to clipboard")
+        print("10\n")
         copy_button.wait_for(state="visible", timeout=30000)
+        print("11\n")
         copy_button.click()
     except Exception as e:
         logger.error(f"Failed to set up GPT-4 parameters: {str(e)}")
