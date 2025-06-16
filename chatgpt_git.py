@@ -29,7 +29,7 @@ Requirements and rules:
 9. Always the last line will be 'இது போல தினசரி செய்திகள் தெரிந்துகொள்ள like, share, subscribe மற்றும் comment செய்யுங்கள்.'
 10. Do not use any other text or comments before or after the news summaries.
 11. Generate more than 20+ important and priority news.
-12. Generate each word properly, fully and correctly do not use something like �, ��, ..etc.
+12. Generate each word properly, fully and correctly do not use something like �, ��, ..etc(exclude all patterns like this).
 
 Please proceed with generating the news summaries."""
 
@@ -49,14 +49,17 @@ def get_clipboard_content():
 def run(playwright: Playwright) -> None:
     logger.info("Starting news bot")
     browser = playwright.chromium.launch(
-        headless=True,
-        channel="chrome"  # Use Chrome browser instead of Chromium
+        headless=True,  # Force headless mode for GitHub Actions
+        args=['--disable-dev-shm-usage', '--no-sandbox']  # Additional args for stability
     )
-    context = browser.new_context()
+    context = browser.new_context(
+        viewport={'width': 1920, 'height': 1080},  # Set a specific viewport
+        user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'  # Set a specific user agent
+    )
     page = context.new_page()
     
     logger.info("Navigating to GitHub login")
-    page.goto("https://github.com/login?return_to=https%3A%2F%2Fgithub.com%2Fmarketplace%2Fmodels%2Fazure-openai%2Fgpt-4-1%2Fplayground")
+    page.goto("https://github.com/login?return_to=https%3A%2F%2Fgithub.com%2Fmarketplace%2Fmodels%2Fazure-openai%2Fgpt-4-1%2Fplayground", wait_until="networkidle")
     
     # Get credentials from environment variables
     github_email = os.environ.get('NEWS_BOT_EMAIL')
@@ -73,22 +76,36 @@ def run(playwright: Playwright) -> None:
     page.get_by_role("button", name="Sign in", exact=True).click()
     
     logger.info("Navigating to GPT-4 playground")
-    page.goto("https://github.com/marketplace/models/azure-openai/gpt-4-1/playground")
+    page.goto("https://github.com/marketplace/models/azure-openai/gpt-4-1/playground", wait_until="networkidle")
     
     logger.info("Setting up GPT-4 parameters")
     try:
-        # Wait for the spinbutton to be visible and ready
-        spinbutton = page.get_by_role("spinbutton", name="Max Completion Tokens")
-        spinbutton.wait_for(state="visible", timeout=60000)  # Increased timeout to 60 seconds
+        # Wait for the page to be fully loaded
+        page.wait_for_load_state("networkidle")
         
-        # Click and fill the spinbutton
-        spinbutton.click(timeout=30000)
-        spinbutton.press("ControlOrMeta+a")
-        spinbutton.fill("32768")
+        # Try multiple strategies to find and interact with the spinbutton
+        spinbutton = None
+        for attempt in range(3):  # Try up to 3 times
+            try:
+                spinbutton = page.get_by_role("spinbutton", name="Max Completion Tokens")
+                if spinbutton.is_visible():
+                    break
+                page.wait_for_timeout(5000)  # Wait 5 seconds between attempts
+            except Exception as e:
+                logger.warning(f"Attempt {attempt + 1} to find spinbutton failed: {str(e)}")
+                if attempt == 2:  # Last attempt
+                    raise
+                page.reload()
+                page.wait_for_load_state("networkidle")
+        
+        if spinbutton:
+            spinbutton.click()
+            spinbutton.press("ControlOrMeta+a")
+            spinbutton.fill("32768")
         
         # Wait for and fill the prompt textbox
         prompt_textbox = page.get_by_role("textbox", name="Prompt", exact=True)
-        prompt_textbox.wait_for(state="visible", timeout=30000)
+        prompt_textbox.wait_for(state="attached", timeout=30000)  # Use 'attached' instead of 'visible'
         prompt_textbox.click()
         prompt_textbox.fill(prompt)
         
@@ -97,10 +114,12 @@ def run(playwright: Playwright) -> None:
         
         logger.info("Waiting for response and copying")
         copy_button = page.get_by_role("button", name="Copy to clipboard")
-        copy_button.wait_for(state="visible", timeout=30000)
+        copy_button.wait_for(state="attached", timeout=30000)  # Use 'attached' instead of 'visible'
         copy_button.click()
     except Exception as e:
         logger.error(f"Failed to set up GPT-4 parameters: {str(e)}")
+        # Take a screenshot for debugging
+        page.screenshot(path="error-screenshot.png")
         raise
 
     # Get clipboard content
