@@ -51,7 +51,7 @@ def run(playwright: Playwright) -> None:
     logger.info("Starting news bot execution")
     try:
         logger.info("Launching browser")
-        browser = playwright.chromium.launch(headless=False)
+        browser = playwright.chromium.launch(headless=True)
         context = browser.new_context()
         page = context.new_page()
         
@@ -90,6 +90,7 @@ def run(playwright: Playwright) -> None:
         copied_content = get_clipboard_content()
         logger.info("Successfully retrieved news content")
         logger.debug(f"Content length: {len(copied_content)} characters")
+        logger.info(f"Content length: {copied_content} characters")
 
         # ---------------------
         logger.info("Cleaning up browser resources")
