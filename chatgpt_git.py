@@ -48,7 +48,7 @@ def get_clipboard_content():
 
 def run(playwright: Playwright) -> None:
     logger.info("Starting news bot")
-    browser = playwright.chromium.launch(headless=False)  # Changed to headless=True for GitHub Actions
+    browser = playwright.chromium.launch(headless=True)  # Changed to headless=True for GitHub Actions
     context = browser.new_context()
     page = context.new_page()
     
