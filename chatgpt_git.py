@@ -81,7 +81,7 @@ def run(playwright: Playwright) -> None:
         # Click and fill the input field
         max_tokens_input.click(timeout=30000)
         max_tokens_input.press("ControlOrMeta+a")
-        max_tokens_input.fill("32768")
+        max_tokens_input.fill("7000")
         
         logger.info("Filling Prompt")
         # Wait for and fill the prompt textbox
