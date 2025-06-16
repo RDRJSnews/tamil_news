@@ -48,7 +48,7 @@ def get_clipboard_content():
 
 def run(playwright: Playwright) -> None:
     logger.info("Starting news bot")
-    browser = playwright.chromium.launch(headless=True)  # Changed to headless=True for GitHub Actions
+    browser = playwright.chromium.launch(headless=False)  # Changed to headless=True for GitHub Actions
     context = browser.new_context()
     page = context.new_page()
     
@@ -73,17 +73,32 @@ def run(playwright: Playwright) -> None:
     page.goto("https://github.com/marketplace/models/azure-openai/gpt-4-1/playground")
     
     logger.info("Setting up GPT-4 parameters")
-    page.get_by_role("spinbutton", name="Max Completion Tokens").click()
-    page.get_by_role("spinbutton", name="Max Completion Tokens").press("ControlOrMeta+a")
-    page.get_by_role("spinbutton", name="Max Completion Tokens").fill("32768")
-    page.get_by_role("textbox", name="Prompt", exact=True).click()
-    page.get_by_role("textbox", name="Prompt", exact=True).fill(prompt)
-    
-    logger.info("Sending prompt to GPT-4")
-    page.get_by_role("button", name="Send now").click()
-    
-    logger.info("Waiting for response and copying")
-    page.get_by_role("button", name="Copy to clipboard").click()
+    try:
+        # Wait for the spinbutton to be visible and ready
+        spinbutton = page.get_by_role("spinbutton", name="Max Completion Tokens")
+        spinbutton.wait_for(state="visible", timeout=60000)  # Increased timeout to 60 seconds
+        
+        # Click and fill the spinbutton
+        spinbutton.click(timeout=30000)
+        spinbutton.press("ControlOrMeta+a")
+        spinbutton.fill("32768")
+        
+        # Wait for and fill the prompt textbox
+        prompt_textbox = page.get_by_role("textbox", name="Prompt", exact=True)
+        prompt_textbox.wait_for(state="visible", timeout=30000)
+        prompt_textbox.click()
+        prompt_textbox.fill(prompt)
+        
+        logger.info("Sending prompt to GPT-4")
+        page.get_by_role("button", name="Send now").click()
+        
+        logger.info("Waiting for response and copying")
+        copy_button = page.get_by_role("button", name="Copy to clipboard")
+        copy_button.wait_for(state="visible", timeout=30000)
+        copy_button.click()
+    except Exception as e:
+        logger.error(f"Failed to set up GPT-4 parameters: {str(e)}")
+        raise
 
     # Get clipboard content
     copied_content = get_clipboard_content()
