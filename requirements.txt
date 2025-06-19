@@ -1,0 +1,6 @@
+google-generativeai
+gtts
+pydub
+pyaudioop
+librosa
+soundfile
