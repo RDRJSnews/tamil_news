@@ -71,6 +71,11 @@ jobs:
           echo "Running news_video.py for English"
           python news_video.py --lang en-in
 
+      - name: Run Hindi news workflow
+        run: |
+          echo "Running news_video.py for Hindi"
+          python news_video.py --lang hi
+
       - name: List files in workspace
         run: ls -lR
 
