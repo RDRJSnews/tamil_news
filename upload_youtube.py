@@ -238,7 +238,7 @@ def upload_video(youtube, TITLE, video_buffer):
         # Add to playlist
         try:
             log_print("INFO", "Adding video to playlist")
-            playlist_id = "PLhv_6lhldIL43rj2UDm1xFagg6EpL8kB_"  # Your playlist ID
+            playlist_id = "PLhv_6lhldIL52dNu3VGOZCjRwDkjeVST_"  # Your playlist ID
             youtube.playlistItems().insert(
                 part="snippet",
                 body={
