@@ -4,3 +4,4 @@ pydub
 librosa
 soundfile
 moviepy==1.0.3
+google-auth-oauthlib
