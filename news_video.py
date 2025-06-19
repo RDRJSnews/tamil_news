@@ -126,19 +126,25 @@ def repeat_video_to_match_audio(video_path, audio_buffer):
             
             log_print("INFO", f"Final video duration: {final_video.duration:.2f}s")
             
-            # Write to bytes buffer instead of file
-            log_print("INFO", "Writing final video to buffer")
-            video_buffer = io.BytesIO()
+            # Write to a temporary file instead of buffer
+            log_print("INFO", "Writing final video to temporary file")
+            with tempfile.NamedTemporaryFile(suffix='.mp4', delete=False) as temp_video_file:
+                temp_video_path = temp_video_file.name
+
             final_video.write_videofile(
-                video_buffer,
-                codec='libx264', 
+                temp_video_path,
+                codec='libx264',
                 audio_codec='aac',
                 fps=video.fps
             )
-            video_buffer.seek(0)
-            
-            buffer_size = len(video_buffer.getvalue())
-            log_print("INFO", f"Video buffer created successfully. Size: {buffer_size} bytes")
+
+            # Read the file into a buffer
+            with open(temp_video_path, 'rb') as f:
+                video_buffer = io.BytesIO(f.read())
+
+            # Clean up the temp file
+            os.unlink(temp_video_path)
+            log_print("INFO", f"Video buffer created successfully. Size: {video_buffer.getbuffer().nbytes} bytes")
             
             # Close the clips to free resources
             log_print("INFO", "Cleaning up video and audio resources")
