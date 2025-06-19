@@ -69,11 +69,12 @@ jobs:
 
       - name: Upload YouTube token (if generated)
         uses: actions/upload-artifact@v3
-        if: success() && hash youtube_token.pickle 2>/dev/null
+        if: success()
         with:
           name: youtube-token
           path: youtube_token.pickle
           retention-days: 30
+          if-no-files-found: ignore
 
       - name: Upload generated video (if exists)
         uses: actions/upload-artifact@v3
