@@ -64,13 +64,8 @@ jobs:
       - name: Run main workflow
         id: run_workflow
         run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ "${{ github.event.inputs.retry_on_failure }}" == "true" ]; then
-            echo "Running with retry logic..."
-            python main_workflow.py --retry
-          else
-            echo "Running without retry logic..."
-            python main_workflow.py
-          fi
+          echo "Running news_video.py (default lang_code=0 for Tamil)"
+          python news_video.py
 
       - name: Upload YouTube token (if generated)
         uses: actions/upload-artifact@v3
