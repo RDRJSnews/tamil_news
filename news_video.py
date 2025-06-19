@@ -7,7 +7,6 @@ import io
 import tempfile
 import os
 from datetime import datetime
-from moviepy.utils import ProgressBar
 
 def log_print(level, message):
     print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} [{level}] {message}")
@@ -137,7 +136,7 @@ def repeat_video_to_match_audio(video_path, audio_buffer):
                 codec='libx264',
                 audio_codec='aac',
                 fps=video.fps,
-                logger=ProgressBar()
+                verbose=False
             )
 
             # Read the file into a buffer
