@@ -200,9 +200,9 @@ def main(lang_code=0):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate news video in Tamil or English.")
-    parser.add_argument('--lang', type=str, default='ta', choices=['ta', 'en-in'], help='Language code: ta for Tamil, en-in for English')
+    parser.add_argument('--lang', type=str, default='ta', choices=['ta', 'en-in', 'hi'], help='Language code: ta for Tamil, en-in for English, hi for Hindi')
     args = parser.parse_args()
-    lang_map = {'ta': 0, 'en-in': 1}
+    lang_map = {'ta': 0, 'en-in': 1, 'hi': 2}
     lang_code = lang_map.get(args.lang, 0)
     from upload_youtube import authenticate_youtube, upload_video, TITLE
     try:
