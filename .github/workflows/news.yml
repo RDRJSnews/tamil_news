@@ -55,7 +55,7 @@ jobs:
           echo "Google credentials file created"
 
       - name: Download YouTube token (if exists)
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: youtube-token
           path: ./
@@ -68,7 +68,7 @@ jobs:
           python news_video.py
 
       - name: Upload YouTube token (if generated)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: success()
         with:
           name: youtube-token
@@ -77,7 +77,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Upload generated video (if exists)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: success()
         with:
           name: video-${{ github.run_id }}
@@ -85,7 +85,7 @@ jobs:
           retention-days: 1
 
       - name: Upload generated audio (if exists)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: success()
         with:
           name: audio-${{ github.run_id }}
