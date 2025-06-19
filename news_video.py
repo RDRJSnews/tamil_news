@@ -189,4 +189,19 @@ def main(lang_code=0):
     except Exception as e:
         log_print("ERROR", f"Error in main video generation process: {str(e)}")
         raise
+
+if __name__ == "__main__":
+    from upload_youtube import authenticate_youtube, upload_video, TITLE
+    try:
+        video_buffer = main(lang_code=0)
+        if not video_buffer:
+            log_print("ERROR", "No video data generated!")
+            exit(1)
+        log_print("INFO", "Video generated successfully!")
+        youtube = authenticate_youtube()
+        upload_video(youtube, TITLE, video_buffer)
+        log_print("INFO", "Successfully uploaded generated video to YouTube")
+    except Exception as e:
+        log_print("ERROR", f"An error occurred in the video generation/upload workflow: {str(e)}")
+        raise
     
