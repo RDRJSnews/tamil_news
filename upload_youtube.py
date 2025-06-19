@@ -11,6 +11,7 @@ from news_video import main as news_video_main
 from news_text import get_gemini_response
 import tempfile
 from datetime import datetime
+import ast
 
 def log_print(level, message):
     print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} [{level}] {message}")
@@ -46,16 +47,7 @@ SCOPES = [
 ]
 
 def get_tags_within_limit(strings_list, max_chars=499):
-    """
-    Returns the largest initial sublist whose total character count <= max_chars.
-    
-    Args:
-        strings_list (list): List of strings to process
-        max_chars (int): Maximum allowed character count (default: 499)
-        
-    Returns:
-        list: Sublist that fits within the character limit
-    """
+
     sublist = []
     current_count = 0
     
@@ -67,7 +59,8 @@ def get_tags_within_limit(strings_list, max_chars=499):
             break
             
     return sublist
-
+# Safely convert to list
+TAGS = ast.literal_eval(TAGS)
 # Focused set of relevant tags (staying within YouTube's 500 character limit)
 TAGS = get_tags_within_limit(TAGS, 499)
 log_print("INFO", f"Generated tags within limit: {TAGS}")
