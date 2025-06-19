@@ -158,35 +158,34 @@ def repeat_video_to_match_audio(video_path, audio_buffer):
         log_print("ERROR", f"Error in video-audio combination: {str(e)}")
         raise
 
-def main():
-    """Main function to generate news video."""
+def main(lang_code=0):
+    """Main function to generate news video. lang_code=0 for Tamil, 1 for English."""
     log_print("INFO", "=== Starting News Video Generation Process ===")
-    
     try:
         video_path = "template.mp4"
         log_print("INFO", f"Using template video: {video_path}")
-        
-        log_print("INFO", "Calling news_audio_main to generate audio")
-        audio_buffer = news_audio_main(1)  # 1 for Tamil, 0 for English
-        
+
+        log_print("INFO", f"Calling news_audio_main to generate audio (lang_code={lang_code})")
+        audio_buffer = news_audio_main(lang_code) # 0 for Tamil, 1 for English
+
         if not audio_buffer:
             log_print("ERROR", "No audio buffer received from news_audio_main")
             raise Exception("Audio generation failed")
-        
+
         log_print("INFO", "Audio buffer received successfully")
-        
+
         speed = 1.25  # 1.25x speed (change this value as needed)
         log_print("INFO", f"Applying speed factor: {speed}x")
-        
+
         log_print("INFO", "Processing audio speed change")
         audio_speeded_buffer = change_audio_speed(audio_buffer, speed)
-        
+
         log_print("INFO", "Combining video and audio")
         final_video_buffer = repeat_video_to_match_audio(video_path, audio_speeded_buffer)
-        
+
         log_print("INFO", "=== News Video Generation Completed Successfully ===")
         return final_video_buffer
-        
+
     except Exception as e:
         log_print("ERROR", f"Error in main video generation process: {str(e)}")
         raise

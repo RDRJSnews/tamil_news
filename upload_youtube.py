@@ -19,15 +19,17 @@ log_print("INFO", "=== Starting YouTube Upload Process ===")
 log_print("INFO", "Generating video metadata with Gemini AI")
 
 try:
-    TITLE = get_gemini_response('''Give a best cautchy attractive youtube title today's top India national news.''')
+    TITLE = get_gemini_response('''Give one best cautchy attractive youtube title on today's top India national news. Give only one title content no extra text. Include emojies.''')
     log_print("INFO", f"Generated title: {TITLE}")
     
     DESCRIPTION = get_gemini_response(f'''Give a best cautchy attractive formatted with oneline space youtube description,
-    with 50 trending # tags in description like #tag1,... , for {TITLE}. My youtube https://www.youtube.com/@rdrjsethurajan and playlist https://www.youtube.com/watch?v=NnQ4a35KR1A&list=PLhv_6lhldIL52dNu3VGOZCjRwDkjeVST_''')
+with 50 trending # tags in description like #tag1,... , for {TITLE}. Use my channel link https://www.youtube.com/@rdrjsethurajan and the playlist link https://www.youtube.com/playlist?list=PLhv_6lhldIL52dNu3VGOZCjRwDkjeVST_''')
     log_print("INFO", f"Generated description length: {len(DESCRIPTION)} characters")
+    log_print("INFO", f"Generated description: {DESCRIPTION}")
     
     # Focused set of relevant tags (staying within YouTube's 500 character limit)
-    TAGS = get_gemini_response(f'''Give a best cautchy attractive 25 youtube tags formatted like ["tag1", ...] for {TITLE}.''')
+    TAGS = get_gemini_response(f'''Give a best cautchy attractive trending youtube tags formatted like ["tag1", ...] for {TITLE}.
+Give only tags content no extra text. Note the sum of all tag length should be less than 500''')
     log_print("INFO", f"Generated tags: {TAGS}")
     
 except Exception as e:
@@ -238,14 +240,14 @@ def upload_video(youtube, TITLE, video_buffer):
         log_print("INFO", "Cleaning up temporary file")
         os.unlink(temp_file_path)
         log_print("INFO", "=== Video Upload Process Completed Successfully ===")
-
 if __name__ == "__main__":
     try:
         log_print("INFO", "=== Starting Complete News Video Upload Workflow ===")
         
         # Get video from news_video.main()
         log_print("INFO", "Generating video from news_video.main()...")
-        video_buffer = news_video_main()
+        lang_code = 1  # Example: lang_code = 1
+        video_buffer = news_video_main(lang_code)
         
         if not video_buffer:
             log_print("ERROR", "No video data generated!")
@@ -273,3 +275,4 @@ if __name__ == "__main__":
     except Exception as e:
         log_print("ERROR", f"An error occurred in main workflow: {str(e)}")
         raise
+
