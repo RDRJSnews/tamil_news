@@ -6,7 +6,7 @@ from datetime import datetime
 def log_print(level, message):
     print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} [{level}] {message}")
 
-def tamil_news_reader(text, lang):
+def news_reader(text, lang):
     """Generate speech from text using gTTS."""
     log_print("INFO", "=== Starting Text-to-Speech Conversion ===")
     log_print("INFO", f"Language: {lang}")
@@ -39,8 +39,8 @@ def main(lang_code):
     log_print("INFO", "=== Starting News Audio Generation Process ===")
     log_print("INFO", f"Language code received: {lang_code}")
     
-    # Tamil English news text
-    langs = ['ta', 'en-in']
+    # Tamil, English, Hindi news text
+    langs = ['ta', 'en-in', 'hi']
     
     if lang_code < 0 or lang_code >= len(langs):
         log_print("ERROR", f"Invalid language code: {lang_code}. Valid range: 0-{len(langs)-1}")
@@ -61,7 +61,7 @@ def main(lang_code):
         log_print("DEBUG", f"News text preview: {news_text[:100]}...")
         
         # Generate audio from text
-        audio_buffer = tamil_news_reader(news_text, lang)
+        audio_buffer = news_reader(news_text, lang)
         
         log_print("INFO", "=== News Audio Generation Completed Successfully ===")
         return audio_buffer
