@@ -55,15 +55,16 @@ def get_tags_within_limit(strings_list, max_chars=499):
         if current_count + len(s) <= max_chars:
             sublist.append(s)
             current_count += len(s)
+            print(current_count, '\n')
         else:
             break
             
-    return sublist
+    return str(sublist)
 # Safely convert to list
 TAGS = ast.literal_eval(TAGS)
 # Focused set of relevant tags (staying within YouTube's 500 character limit)
 TAGS = get_tags_within_limit(TAGS, 499)
-log_print("INFO", f"Generated tags within limit: {TAGS}")
+print("INFO", f"Generated tags within limit: {TAGS}")
 
 def authenticate_youtube():
     """Authenticate with YouTube API using cached credentials if available."""
