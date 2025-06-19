@@ -61,11 +61,15 @@ jobs:
           path: ./
         continue-on-error: true
 
-      - name: Run main workflow
-        id: run_workflow
+      - name: Run Tamil news workflow
         run: |
-          echo "Running news_video.py (default lang_code=0 for Tamil)"
-          python news_video.py
+          echo "Running news_video.py for Tamil"
+          python news_video.py --lang ta
+
+      - name: Run English news workflow
+        run: |
+          echo "Running news_video.py for English"
+          python news_video.py --lang en-in
 
       - name: List files in workspace
         run: ls -lR
