@@ -6,11 +6,13 @@ on:
       language:
         description: 'Language for news generation'
         required: false
-        default: 'en-in'
+        default: 'all'
         type: choice
         options:
+          - all
           - en-in
           - ta
+          - hi
       retry_on_failure:
         description: 'Retry on failure (up to 3 times)'
         required: false
@@ -62,16 +64,19 @@ jobs:
         continue-on-error: true
 
       - name: Run Tamil news workflow
+        if: ${{ github.event.inputs.language == 'all' || github.event.inputs.language == 'ta' }}
         run: |
           echo "Running news_video.py for Tamil"
           python news_video.py --lang ta
 
       - name: Run English news workflow
+        if: ${{ github.event.inputs.language == 'all' || github.event.inputs.language == 'en-in' }}
         run: |
           echo "Running news_video.py for English"
           python news_video.py --lang en-in
 
       - name: Run Hindi news workflow
+        if: ${{ github.event.inputs.language == 'all' || github.event.inputs.language == 'hi' }}
         run: |
           echo "Running news_video.py for Hindi"
           python news_video.py --lang hi
