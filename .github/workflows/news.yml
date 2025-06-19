@@ -61,9 +61,6 @@ jobs:
           path: ./
         continue-on-error: true
 
-      - name: Create logs directory
-        run: mkdir -p logs
-
       - name: Run main workflow
         id: run_workflow
         run: |
@@ -74,14 +71,6 @@ jobs:
             echo "Running without retry logic..."
             python main_workflow.py
           fi
-
-      - name: Upload logs as artifacts
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: logs-${{ github.run_id }}
-          path: logs/
-          retention-days: 7
 
       - name: Upload YouTube token (if generated)
         uses: actions/upload-artifact@v3
@@ -129,4 +118,4 @@ jobs:
           rm -f youtube_token.pickle
           rm -f *.wav
           rm -f output_video*.mp4
-          echo "�� Cleanup completed" 
+          echo "Cleanup completed" 
