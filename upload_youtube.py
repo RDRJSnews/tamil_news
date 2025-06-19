@@ -29,7 +29,7 @@ with 50 trending # tags in description like #tag1,... , for {TITLE}. Use my chan
     
     # Focused set of relevant tags (staying within YouTube's 500 character limit)
     TAGS = get_gemini_response(f'''Give a best trending viral youtube tags formatted like ["tag1", "tag2", ...] for {TITLE}.
-Give only tags content no extra text. Note that the sum of all tag length that is len(tag1)+len(tag2)+...etc. should be less than 470''')
+Give only tags content no extra text. Note that the sum of all tag length that is len(tag1)+len(tag2)+...etc. should be less than 500''')
     log_print("INFO", f"Generated tags: {TAGS}")
     
 except Exception as e:
@@ -44,6 +44,33 @@ SCOPES = [
     "https://www.googleapis.com/auth/youtube.upload",
     "https://www.googleapis.com/auth/youtube.force-ssl"  # This scope allows playlist modifications
 ]
+
+def get_tags_within_limit(strings_list, max_chars=499):
+    """
+    Returns the largest initial sublist whose total character count <= max_chars.
+    
+    Args:
+        strings_list (list): List of strings to process
+        max_chars (int): Maximum allowed character count (default: 499)
+        
+    Returns:
+        list: Sublist that fits within the character limit
+    """
+    sublist = []
+    current_count = 0
+    
+    for s in strings_list:
+        if current_count + len(s) <= max_chars:
+            sublist.append(s)
+            current_count += len(s)
+        else:
+            break
+            
+    return sublist
+
+# Focused set of relevant tags (staying within YouTube's 500 character limit)
+TAGS = get_tags_within_limit(TAGS, 499)
+log_print("INFO", f"Generated tags within limit: {TAGS}")
 
 def authenticate_youtube():
     """Authenticate with YouTube API using cached credentials if available."""
