@@ -28,8 +28,8 @@ with 50 trending # tags in description like #tag1,... , for {TITLE}. Use my chan
     log_print("INFO", f"Generated description: {DESCRIPTION}")
     
     # Focused set of relevant tags (staying within YouTube's 500 character limit)
-    TAGS = get_gemini_response(f'''Give a best cautchy attractive trending youtube tags formatted like ["tag1", ...] for {TITLE}.
-Give only tags content no extra text. Note the sum of all tag length should be less than 500''')
+    TAGS = get_gemini_response(f'''Give a best trending viral youtube tags formatted like ["tag1", "tag2", ...] for {TITLE}.
+Give only tags content no extra text. Note that the sum of all tag length(len(tag1)+len(tag2)+...) should be less than 500''')
     log_print("INFO", f"Generated tags: {TAGS}")
     
 except Exception as e:
