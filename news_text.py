@@ -40,6 +40,23 @@ Requirements and rules:
 
 Please proceed with generating the news summaries."""
 
+prompt_hi = """Generate today's National news summaries in Hindi language.
+
+Requirements and rules:
+1. Always the first line with be 'आज की राष्ट्रीय खबरें:'
+2. Generate each news with a suitable title then : followed by the respective news summay
+3. Do not use commas in numbers (e.g., use ₹14588 instead of ₹14,588)
+4. Generate in plain text without any special characters (**, ##, etc.)
+5. Collect maximum possible news
+6. Start generating news immediately without explanations
+7. Must end each line with appropriate punctuation (. or , or :)
+8. Do not include emojis or URLs—mention only the domain name (e.g., dinamalar, vikatan, thehindu, ndtv, etc.) after the word ". செய்திகள் வலங்கியது:" at the end of the news summary and ending with '.'.
+9. Always the last line will be 'ऐसे ही दैनिक समाचार जानने के लिए like, share, subscribe और comment इसे करें.'
+10. Do not use any other text or comments before or after the news summaries.
+11. Generate 15 most important and priority news.
+
+Please proceed with generating the news summaries."""
+
 # Configure the API with your key from environment variable
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', "AIzaSyD2twlGOLgwO_cyFgNpCNDR6GlXbGkvcZA")
 
@@ -187,6 +204,9 @@ def main(lang):
     elif lang == 'ta':
         prompt = prompt_ta
         log_print("INFO", "Using Tamil prompt")
+    elif lang == 'hi':
+        prompt = prompt_hi
+        log_print("INFO", "Using Hindi prompt")
     else:
         log_print("ERROR", f"Unsupported language: {lang}")
         raise ValueError(f"Unsupported language: {lang}")
