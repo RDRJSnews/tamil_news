@@ -67,6 +67,9 @@ jobs:
           echo "Running news_video.py (default lang_code=0 for Tamil)"
           python news_video.py
 
+      - name: List files in workspace
+        run: ls -lR
+
       - name: Upload YouTube token (if generated)
         uses: actions/upload-artifact@v4
         if: success()
