@@ -7,6 +7,7 @@ import io
 import tempfile
 import os
 from datetime import datetime
+import argparse
 
 def log_print(level, message):
     print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} [{level}] {message}")
@@ -198,9 +199,14 @@ def main(lang_code=0):
         raise
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Generate news video in Tamil or English.")
+    parser.add_argument('--lang', type=str, default='ta', choices=['ta', 'en-in'], help='Language code: ta for Tamil, en-in for English')
+    args = parser.parse_args()
+    lang_map = {'ta': 0, 'en-in': 1}
+    lang_code = lang_map.get(args.lang, 0)
     from upload_youtube import authenticate_youtube, upload_video, TITLE
     try:
-        video_buffer = main(lang_code=0)
+        video_buffer = main(lang_code=lang_code)
         if not video_buffer:
             log_print("ERROR", "No video data generated!")
             exit(1)
