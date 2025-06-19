@@ -79,22 +79,6 @@ jobs:
           retention-days: 30
           if-no-files-found: ignore
 
-      - name: Upload generated video (if exists)
-        uses: actions/upload-artifact@v4
-        if: success()
-        with:
-          name: video-${{ github.run_id }}
-          path: "output_video*.mp4"
-          retention-days: 1
-
-      - name: Upload generated audio (if exists)
-        uses: actions/upload-artifact@v4
-        if: success()
-        with:
-          name: audio-${{ github.run_id }}
-          path: "*.wav"
-          retention-days: 1
-
       - name: Notify on success
         if: success()
         run: |
