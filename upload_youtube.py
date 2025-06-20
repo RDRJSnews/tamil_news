@@ -19,55 +19,57 @@ def log_print(level, message):
 log_print("INFO", "=== Starting YouTube Upload Process ===")
 log_print("INFO", "Generating video metadata with Gemini AI")
 
-try:
-    TITLE = get_gemini_response('''Give one best cautchy attractive youtube title on today's top India national news. Give only one title content no extra text. Include emojies.''')
-    log_print("INFO", f"Generated title: {TITLE}")
-    
-    DESCRIPTION = get_gemini_response(f'''Give a best cautchy attractive formatted with oneline space youtube description,
-with 50 trending # tags in description like #tag1,... , for {TITLE}. Use my channel link https://www.youtube.com/@rdrjsethurajan and the playlist link https://www.youtube.com/playlist?list=PLhv_6lhldIL52dNu3VGOZCjRwDkjeVST_''')
-    log_print("INFO", f"Generated description length: {len(DESCRIPTION)} characters")
-    log_print("INFO", f"Generated description: {DESCRIPTION}")
-    
+def generate_title_description_tags():
+    try:
+        TITLE = get_gemini_response('''Give one best cautchy attractive youtube title on today's top India national news. Give only one title content no extra text. Include emojies.''')
+        log_print("INFO", f"Generated title: {TITLE}")
+        
+        DESCRIPTION = get_gemini_response(f'''Give a best cautchy attractive formatted with oneline space youtube description,
+    with 50 trending # tags in description like #tag1,... , for {TITLE}. Use my channel link https://www.youtube.com/@rdrjsethurajan and the playlist link https://www.youtube.com/playlist?list=PLhv_6lhldIL52dNu3VGOZCjRwDkjeVST_''')
+        log_print("INFO", f"Generated description length: {len(DESCRIPTION)} characters")
+        log_print("INFO", f"Generated description: {DESCRIPTION}")
+        
+        # Focused set of relevant tags (staying within YouTube's 500 character limit)
+        TAGS = get_gemini_response(f'''Give a best trending viral youtube tags formatted like ["tag1", "tag2", ...] for {TITLE}.
+    Give only tags content no extra text. Note that the sum of all tag length that is len(tag1)+len(tag2)+...etc. should be less than 500''')
+        log_print("INFO", f"Generated tags: {TAGS}")
+        
+    except Exception as e:
+        log_print("ERROR", f"Error generating metadata: {str(e)}")
+        # Fallback metadata
+        TITLE = "Today's Top India National News - Latest Updates"
+        DESCRIPTION = "Stay updated with the latest national news from India. #India #News #National #Updates"
+        TAGS = ["India", "News", "National", "Updates", "Latest"]
+
+    def get_tags_within_limit(strings_list, max_chars=499):
+        sublist = []
+        current_count = 0
+        for s in strings_list:
+            s = s.strip()
+            if not s or len(s) > 10:
+                continue  # skip empty or too-long tags
+            if current_count + len(s) <= max_chars:
+                sublist.append(s)
+                current_count += len(s)
+                print(current_count, '\n')
+            else:
+                break
+        return str(sublist)  # return as str(sublist)
+
+    # Safely convert to list
+    TAGS = ast.literal_eval(TAGS)
     # Focused set of relevant tags (staying within YouTube's 500 character limit)
-    TAGS = get_gemini_response(f'''Give a best trending viral youtube tags formatted like ["tag1", "tag2", ...] for {TITLE}.
-Give only tags content no extra text. Note that the sum of all tag length that is len(tag1)+len(tag2)+...etc. should be less than 500''')
-    log_print("INFO", f"Generated tags: {TAGS}")
-    
-except Exception as e:
-    log_print("ERROR", f"Error generating metadata: {str(e)}")
-    # Fallback metadata
-    TITLE = "Today's Top India National News - Latest Updates"
-    DESCRIPTION = "Stay updated with the latest national news from India. #India #News #National #Updates"
-    TAGS = ["India", "News", "National", "Updates", "Latest"]
+    TAGS = get_tags_within_limit(TAGS, 499)
+    print("INFO", f"Generated tags within limit: {TAGS}")
+    print("INFO", f"Type of TAGS: {type(TAGS)}")
+
+    return TITLE, DESCRIPTION, TAGS
 
 # Add playlist modification scope
 SCOPES = [
     "https://www.googleapis.com/auth/youtube.upload",
     "https://www.googleapis.com/auth/youtube.force-ssl"  # This scope allows playlist modifications
 ]
-
-def get_tags_within_limit(strings_list, max_chars=499):
-    sublist = []
-    current_count = 0
-    for s in strings_list:
-        s = s.strip()
-        if not s or len(s) > 10:
-            continue  # skip empty or too-long tags
-        if current_count + len(s) <= max_chars:
-            sublist.append(s)
-            current_count += len(s)
-            print("current_tag: ", s, " len(current_tag): ", len(s), " current_count: ", current_count, " / ","max_chars: " , max_chars, '\n')
-        else:
-            print("current_tag: ", s, " len(current_tag): ", len(s), " current_count: ", current_count, " / ","max_chars: " , max_chars, '\n')
-            break
-    return str(sublist)  # return as str(sublist)
-
-# Safely convert to list
-TAGS = ast.literal_eval(TAGS)
-# Focused set of relevant tags (staying within YouTube's 500 character limit)
-TAGS = get_tags_within_limit(TAGS, 499)
-print("INFO", f"Generated tags within limit: {TAGS}")
-print("INFO", f"Type of TAGS: {type(TAGS)}")
 
 def authenticate_youtube():
     """Authenticate with YouTube API using cached credentials if available."""
@@ -177,7 +179,7 @@ def authenticate_youtube():
         log_print("ERROR", f"Error building YouTube service: {str(e)}")
         raise
 
-def upload_video(youtube, TITLE, video_buffer):
+def upload_video(youtube, TITLE, DESCRIPTION, TAGS, video_buffer):
     """Upload a video to YouTube with the given title and video buffer."""
     log_print("INFO", "=== Starting Video Upload Process ===")
     log_print("INFO", f"Uploading video with title: {TITLE}")
@@ -282,13 +284,15 @@ if __name__ == "__main__":
         # Authenticate once for all uploads
         log_print("INFO", "Authenticating with YouTube")
         youtube = authenticate_youtube()
+
+        TITLE, DESCRIPTION, TAGS = generate_title_description_tags()
         
         # Upload the video
         try:
             log_print("INFO", "Processing generated video for upload")
             log_print("INFO", f"Generated title: {TITLE}")
             
-            upload_video(youtube, TITLE, video_buffer)
+            upload_video(youtube, TITLE, DESCRIPTION, TAGS, video_buffer)
             log_print("INFO", "Successfully uploaded generated video")
             
         except Exception as e:
