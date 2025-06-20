@@ -19,9 +19,19 @@ def log_print(level, message):
 log_print("INFO", "=== Starting YouTube Upload Process ===")
 log_print("INFO", "Generating video metadata with Gemini AI")
 
-def generate_title_description_tags():
+def generate_title_description_tags(lang_code):
     try:
-        TITLE = get_gemini_response('''Give one best cautchy attractive youtube title on today's top India national news. Give only one title content no extra text. Include emojies.''')
+        lang_list = ['ta', 'en-in', 'hi']
+        if lang_code == lang_list[0]:
+            language = 'Tamil'
+        elif lang_code == lang_list[1]:
+            language = 'English'
+        elif lang_code == lang_list[2]:
+            language = 'Hindi'
+        else:
+            raise ValueError(f"Invalid language code: {lang_code}. Valid range: 0-{len(lang_list)-1}")
+
+        TITLE = get_gemini_response(f'''Give one best cautchy attractive youtube title on today's top India national news in {language}. Give only one title content no extra text. Include emojies.''')
         log_print("INFO", f"Generated title: {TITLE}")
         
         DESCRIPTION = get_gemini_response(f'''Give a best cautchy attractive formatted with oneline space youtube description,
@@ -285,7 +295,7 @@ if __name__ == "__main__":
         log_print("INFO", "Authenticating with YouTube")
         youtube = authenticate_youtube()
 
-        TITLE, DESCRIPTION, TAGS = generate_title_description_tags()
+        TITLE, DESCRIPTION, TAGS = generate_title_description_tags(lang_code)
         
         # Upload the video
         try:
