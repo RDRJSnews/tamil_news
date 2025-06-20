@@ -21,7 +21,6 @@ on:
   schedule:
     - cron: '30 0 * * *'    # 6:00 AM IST (00:30 UTC)
     - cron: '30 12 * * *'   # 6:00 PM IST (12:30 UTC)
-    - cron: '30 11 * * *'   # 5:00 PM IST (11:30 UTC)
 
 jobs:
   run-news:
@@ -69,23 +68,20 @@ jobs:
         run: |
           echo "${{ secrets.YOUTUBE_TOKEN_BASE64 }}" | base64 -d > youtube_token.pickle
 
-      - name: Run Tamil news workflow
-        if: env.LANGUAGE == 'all' || env.LANGUAGE == 'ta'
+      - name: Run news workflows
         run: |
-          echo "Running news_video.py for Tamil"
-          python news_video.py --lang ta
-
-      - name: Run English news workflow
-        if: env.LANGUAGE == 'all' || env.LANGUAGE == 'en-in'
-        run: |
-          echo "Running news_video.py for English"
-          python news_video.py --lang en-in
-
-      - name: Run Hindi news workflow
-        if: env.LANGUAGE == 'all' || env.LANGUAGE == 'hi'
-        run: |
-          echo "Running news_video.py for Hindi"
-          python news_video.py --lang hi
+          if [[ "$LANGUAGE" == "all" || "$LANGUAGE" == "ta" ]]; then
+            echo "Running news_video.py for Tamil"
+            python news_video.py --lang ta
+          fi
+          if [[ "$LANGUAGE" == "all" || "$LANGUAGE" == "en-in" ]]; then
+            echo "Running news_video.py for English"
+            python news_video.py --lang en-in
+          fi
+          if [[ "$LANGUAGE" == "all" || "$LANGUAGE" == "hi" ]]; then
+            echo "Running news_video.py for Hindi"
+            python news_video.py --lang hi
+          fi
 
       - name: List files in workspace
         run: ls -lR
