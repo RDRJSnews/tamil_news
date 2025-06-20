@@ -6,7 +6,7 @@ from datetime import datetime
 def log_print(level, message):
     print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} [{level}] {message}")
 
-prompt_en = """Generate today's National news summaries in English language.
+prompt_en = """TL;DR: Generate today's National news summaries in English language.
 
 Requirements and rules:
 1. Always the first line with be "Today's National News:"
@@ -23,7 +23,7 @@ Requirements and rules:
 
 Please proceed with generating the news summaries."""
 
-prompt_ta = """Generate today's National news summaries in Tamil language.
+prompt_ta = """TL;DR: Generate today's National news summaries in Tamil language.
 
 Requirements and rules:
 1. Always the first line with be 'இன்றைய தேசிய செய்திகள்:'
@@ -40,7 +40,7 @@ Requirements and rules:
 
 Please proceed with generating the news summaries."""
 
-prompt_hi = """Generate today's National news summaries in Hindi language.
+prompt_hi = """TL;DR: Generate today's National news summaries in Hindi language.
 
 Requirements and rules:
 1. Always the first line with be 'आज की राष्ट्रीय खबरें:'
