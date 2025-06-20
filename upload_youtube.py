@@ -56,7 +56,7 @@ def get_tags_within_limit(strings_list, max_chars=499):
         if current_count + len(s) <= max_chars:
             sublist.append(s)
             current_count += len(s)
-            print(current_count, '\n')
+            print("len(current_tag): ", len(s), " current_count: ", current_count, " / ","max_chars: " , max_chars, '\n')
         else:
             break
     return str(sublist)  # return as str(sublist)
