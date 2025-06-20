@@ -29,11 +29,11 @@ log_print("INFO", "Generating video metadata with Gemini AI")
 def generate_title_description_tags(lang_code):
     try:
         lang_list = ['ta', 'en-in', 'hi']
-        if lang_code == lang_list[0]:
+        if lang_code == 0:
             language = 'Tamil'
-        elif lang_code == lang_list[1]:
+        elif lang_code == 1:
             language = 'English'
-        elif lang_code == lang_list[2]:
+        elif lang_code == 2:
             language = 'Hindi'
         else:
             raise ValueError(f"Invalid language code: {lang_code}. Valid range: 0-{len(lang_list)-1}")
@@ -73,8 +73,9 @@ def generate_title_description_tags(lang_code):
                 break
         return str(sublist)  # return as str(sublist)
 
-    # Safely convert to list
-    TAGS = ast.literal_eval(TAGS)
+    # Safely convert to list if TAGS is a string
+    if isinstance(TAGS, str):
+        TAGS = ast.literal_eval(TAGS)
     # Focused set of relevant tags (staying within YouTube's 500 character limit)
     TAGS = get_tags_within_limit(TAGS, 499)
     print("INFO", f"Generated tags within limit: {TAGS}")
