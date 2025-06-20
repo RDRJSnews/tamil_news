@@ -12,6 +12,7 @@ from news_text import get_gemini_response
 import tempfile
 from datetime import datetime
 import ast
+import argparse
 
 # Add playlist modification scope
 SCOPES = [
@@ -280,39 +281,48 @@ def upload_video(youtube, TITLE, DESCRIPTION, TAGS, video_buffer):
 if __name__ == "__main__":
     try:
         log_print("INFO", "=== Starting Complete News Video Upload Workflow ===")
-        
-        # Get video from news_video.main()
-        log_print("INFO", "Generating video from news_video.main()...")
-        
-        lang_code = 1  # Example: lang_code = 1
 
-        TITLE, DESCRIPTION, TAGS = generate_title_description_tags(lang_code)
+        parser = argparse.ArgumentParser(description="Upload generated news video to YouTube.")
+        parser.add_argument('--lang', type=str, default='ta', choices=['ta', 'en-in', 'hi'], help='Language code: ta for Tamil, en-in for English, hi for Hindi')
+        args = parser.parse_args()
+        lang_map = {'ta': 0, 'en-in': 1, 'hi': 2}
+        lang_code = lang_map.get(args.lang, 0)
 
-        video_buffer = news_video_main(lang_code)
-        
-        if not video_buffer:
-            log_print("ERROR", "No video data generated!")
+        TITLE, DESCRIPTION, TAGS = generate_title_description_tags(args.lang)
+
+        # Determine the video file name based on language
+        video_file_map = {
+            'ta': 'output_video.mp4',
+            'en-in': 'output_video_1.mp4',
+            'hi': 'output_video_2.mp4'
+        }
+        video_path = video_file_map.get(args.lang, 'output_video.mp4')
+
+        if not os.path.exists(video_path):
+            log_print("ERROR", f"Video file {video_path} does not exist!")
             exit(1)
-            
-        log_print("INFO", "Video generated successfully!")
-            
+
+        with open(video_path, "rb") as f:
+            import io
+            video_buffer = io.BytesIO(f.read())
+
+        log_print("INFO", "Video file loaded successfully!")
+
         # Authenticate once for all uploads
         log_print("INFO", "Authenticating with YouTube")
         youtube = authenticate_youtube()
-        
+
         # Upload the video
         try:
-            log_print("INFO", "Processing generated video for upload")
+            log_print("INFO", "Processing video for upload")
             log_print("INFO", f"Generated title: {TITLE}")
-            
             upload_video(youtube, TITLE, DESCRIPTION, TAGS, video_buffer)
             log_print("INFO", "Successfully uploaded generated video")
-            
         except Exception as e:
             log_print("ERROR", f"Error uploading video: {str(e)}")
-                
+
         log_print("INFO", "=== Complete News Video Upload Workflow Completed Successfully ===")
-        
+
     except Exception as e:
         log_print("ERROR", f"An error occurred in main workflow: {str(e)}")
         raise
