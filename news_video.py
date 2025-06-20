@@ -204,7 +204,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     lang_map = {'ta': 0, 'en-in': 1, 'hi': 2}
     lang_code = lang_map.get(args.lang, 0)
-    from upload_youtube import authenticate_youtube, upload_video, TITLE
+    from upload_youtube import generate_title_description_tags, authenticate_youtube, upload_video
     try:
         video_buffer = main(lang_code=lang_code)
         if not video_buffer:
@@ -212,7 +212,8 @@ if __name__ == "__main__":
             exit(1)
         log_print("INFO", "Video generated successfully!")
         youtube = authenticate_youtube()
-        upload_video(youtube, TITLE, video_buffer)
+        TITLE, DESCRIPTION, TAGS = generate_title_description_tags(lang_code)
+        upload_video(youtube, TITLE, DESCRIPTION, TAGS, video_buffer)
         log_print("INFO", "Successfully uploaded generated video to YouTube")
     except Exception as e:
         log_print("ERROR", f"An error occurred in the video generation/upload workflow: {str(e)}")
