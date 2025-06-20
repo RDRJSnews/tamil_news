@@ -289,7 +289,7 @@ if __name__ == "__main__":
         lang_map = {'ta': 0, 'en-in': 1, 'hi': 2}
         lang_code = lang_map.get(args.lang, 0)
 
-        TITLE, DESCRIPTION, TAGS = generate_title_description_tags(args.lang)
+        TITLE, DESCRIPTION, TAGS = generate_title_description_tags(lang_code)
 
         # Determine the video file name based on language
         video_file_map = {
