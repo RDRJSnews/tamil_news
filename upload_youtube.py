@@ -14,6 +14,10 @@ from datetime import datetime
 import ast
 import argparse
 
+TITLE = ""
+DESCRIPTION = ""
+TAGS = ""
+
 # Add playlist modification scope
 SCOPES = [
     "https://www.googleapis.com/auth/youtube.upload",
