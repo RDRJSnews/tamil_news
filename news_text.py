@@ -50,7 +50,7 @@ Requirements and rules:
 5. Collect maximum possible news
 6. Start generating news immediately without explanations
 7. Must end each line with appropriate punctuation (. or , or :)
-8. Do not include emojis or URLs—mention only the domain name (e.g., dinamalar, vikatan, thehindu, ndtv, etc.) after the word ". खबर पुख्ता है:" at the end of the news summary and ending with '.'.
+8. Do not include emojis or URLs—mention only the domain name (e.g., dinamalar, vikatan, thehindu, ndtv, etc.) after the word ". इस समाचार की पुष्टि निम्नलिखित द्वारा की गई है:" at the end of the news summary and ending with '.'.
 9. Always the last line will be 'ऐसे ही दैनिक समाचार जानने के लिए like, share, subscribe और comment इसे करें.'
 10. Do not use any other text or comments before or after the news summaries.
 11. Generate 15 most important and priority news.
