@@ -182,7 +182,7 @@ def main(lang_code=0):
 
         log_print("INFO", "Audio buffer received successfully")
 
-        speed = 1.25  # 1.25x speed (change this value as needed)
+        speed = 1.5  # 1.5x speed (change this value as needed)
         log_print("INFO", f"Applying speed factor: {speed}x")
 
         log_print("INFO", "Processing audio speed change")
