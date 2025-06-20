@@ -21,7 +21,6 @@ on:
   schedule:
     - cron: '30 0 * * *'    # 6:00 AM IST (00:30 UTC)
     - cron: '30 12 * * *'   # 6:00 PM IST (12:30 UTC)
-    - cron: '30 11 * * *'   # 5:00 PM IST (11:30 UTC)
 
 jobs:
   run-news:
@@ -74,14 +73,20 @@ jobs:
           if [[ "$LANGUAGE" == "all" || "$LANGUAGE" == "ta" ]]; then
             echo "Running news_video.py for Tamil"
             python news_video.py --lang ta
+            echo "Uploading Tamil video to YouTube"
+            python upload_youtube.py --lang ta
           fi
           if [[ "$LANGUAGE" == "all" || "$LANGUAGE" == "en-in" ]]; then
             echo "Running news_video.py for English"
             python news_video.py --lang en-in
+            echo "Uploading English video to YouTube"
+            python upload_youtube.py --lang en-in
           fi
           if [[ "$LANGUAGE" == "all" || "$LANGUAGE" == "hi" ]]; then
             echo "Running news_video.py for Hindi"
             python news_video.py --lang hi
+            echo "Uploading Hindi video to YouTube"
+            python upload_youtube.py --lang hi
           fi
 
       - name: List files in workspace
