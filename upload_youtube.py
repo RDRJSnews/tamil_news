@@ -13,10 +13,6 @@ import tempfile
 from datetime import datetime
 import ast
 
-TITLE = ""
-DESCRIPTION = ""
-TAGS = ""
-
 # Add playlist modification scope
 SCOPES = [
     "https://www.googleapis.com/auth/youtube.upload",
@@ -287,7 +283,11 @@ if __name__ == "__main__":
         
         # Get video from news_video.main()
         log_print("INFO", "Generating video from news_video.main()...")
+        
         lang_code = 1  # Example: lang_code = 1
+
+        TITLE, DESCRIPTION, TAGS = generate_title_description_tags(lang_code)
+
         video_buffer = news_video_main(lang_code)
         
         if not video_buffer:
@@ -299,8 +299,6 @@ if __name__ == "__main__":
         # Authenticate once for all uploads
         log_print("INFO", "Authenticating with YouTube")
         youtube = authenticate_youtube()
-
-        TITLE, DESCRIPTION, TAGS = generate_title_description_tags(lang_code)
         
         # Upload the video
         try:
