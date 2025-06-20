@@ -58,11 +58,9 @@ Requirements and rules:
 Please proceed with generating the news summaries."""
 
 # Configure the API with your key from environment variable
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', "AIzaSyD2twlGOLgwO_cyFgNpCNDR6GlXbGkvcZA")
-
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 if not GEMINI_API_KEY:
-    log_print("ERROR", "GEMINI_API_KEY environment variable is not set!")
-    raise ValueError("GEMINI_API_KEY environment variable is required")
+    raise RuntimeError("GEMINI_API_KEY environment variable not set!")
 
 log_print("INFO", "Configuring Gemini API with environment variable")
 genai.configure(api_key=GEMINI_API_KEY)
