@@ -19,9 +19,8 @@ on:
         default: true
         type: boolean
   schedule:
-    - cron: '30 0 * * *'   # 6:00 AM IST (00:30 UTC)
-    - cron: '30 12 * * *'  # 6:00 PM IST (12:30 UTC)
-    - cron: '0 9 * * *'   # 2:30 PM IST (09:00 UTC)
+    - cron: '30 0 * * *'    # 6:00 AM IST (00:30 UTC)
+    - cron: '30 12 * * *'   # 6:00 PM IST (12:30 UTC)
 
 jobs:
   run-news:
@@ -32,6 +31,14 @@ jobs:
       PYTHONUNBUFFERED: 1  # Ensure Python output is not buffered
 
     steps:
+      - name: Set language variable
+        run: |
+          if [ -z "${{ github.event.inputs.language }}" ]; then
+            echo "LANGUAGE=all" >> $GITHUB_ENV
+          else
+            echo "LANGUAGE=${{ github.event.inputs.language }}" >> $GITHUB_ENV
+          fi
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -57,42 +64,30 @@ jobs:
           echo "$CLIENT_JSON" > client.json
           echo "Google credentials file created"
 
-      - name: Download YouTube token (if exists)
-        uses: actions/download-artifact@v4
-        with:
-          name: youtube-token
-          path: ./
-        continue-on-error: true
+      - name: Restore YouTube token from secret
+        run: |
+          echo "${{ secrets.YOUTUBE_TOKEN_BASE64 }}" | base64 -d > youtube_token.pickle
 
       - name: Run Tamil news workflow
-        if: ${{ github.event.inputs.language == 'all' || github.event.inputs.language == 'ta' }}
+        if: env.LANGUAGE == 'all' || env.LANGUAGE == 'ta'
         run: |
           echo "Running news_video.py for Tamil"
           python news_video.py --lang ta
 
       - name: Run English news workflow
-        if: ${{ github.event.inputs.language == 'all' || github.event.inputs.language == 'en-in' }}
+        if: env.LANGUAGE == 'all' || env.LANGUAGE == 'en-in'
         run: |
           echo "Running news_video.py for English"
           python news_video.py --lang en-in
 
       - name: Run Hindi news workflow
-        if: ${{ github.event.inputs.language == 'all' || github.event.inputs.language == 'hi' }}
+        if: env.LANGUAGE == 'all' || env.LANGUAGE == 'hi'
         run: |
           echo "Running news_video.py for Hindi"
           python news_video.py --lang hi
 
       - name: List files in workspace
         run: ls -lR
-
-      - name: Upload YouTube token (if generated)
-        uses: actions/upload-artifact@v4
-        if: success()
-        with:
-          name: youtube-token
-          path: youtube_token.pickle
-          retention-days: 30
-          if-no-files-found: ignore
 
       - name: Notify on success
         if: success()
