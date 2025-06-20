@@ -21,7 +21,7 @@ on:
   schedule:
     - cron: '30 0 * * *'   # 6:00 AM IST (00:30 UTC)
     - cron: '30 12 * * *'  # 6:00 PM IST (12:30 UTC)
-    - cron: '52 8 * * *'   # 2:22 PM IST (08:52 UTC)
+    - cron: '0 9 * * *'   # 2:30 PM IST (09:00 UTC)
 
 jobs:
   run-news:
