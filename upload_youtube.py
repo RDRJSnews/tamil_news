@@ -13,6 +13,16 @@ import tempfile
 from datetime import datetime
 import ast
 
+TITLE = ""
+DESCRIPTION = ""
+TAGS = ""
+
+# Add playlist modification scope
+SCOPES = [
+    "https://www.googleapis.com/auth/youtube.upload",
+    "https://www.googleapis.com/auth/youtube.force-ssl"  # This scope allows playlist modifications
+]
+
 def log_print(level, message):
     print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} [{level}] {message}")
 
@@ -74,12 +84,6 @@ def generate_title_description_tags(lang_code):
     print("INFO", f"Type of TAGS: {type(TAGS)}")
 
     return TITLE, DESCRIPTION, TAGS
-
-# Add playlist modification scope
-SCOPES = [
-    "https://www.googleapis.com/auth/youtube.upload",
-    "https://www.googleapis.com/auth/youtube.force-ssl"  # This scope allows playlist modifications
-]
 
 def authenticate_youtube():
     """Authenticate with YouTube API using cached credentials if available."""
@@ -276,6 +280,7 @@ def upload_video(youtube, TITLE, DESCRIPTION, TAGS, video_buffer):
         log_print("INFO", "Cleaning up temporary file")
         os.unlink(temp_file_path)
         log_print("INFO", "=== Video Upload Process Completed Successfully ===")
+
 if __name__ == "__main__":
     try:
         log_print("INFO", "=== Starting Complete News Video Upload Workflow ===")
