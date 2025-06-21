@@ -206,6 +206,7 @@ def upload_video(youtube, TITLE, DESCRIPTION, TAGS, video_buffer):
         "status": {
             "privacyStatus": "public",  # or "private"/"unlisted"
             # "selfDeclaredMadeForKids": False,  # Mandatory COPPA compliance
+            "autoCaption": True  # Enable auto captions by default
         },
         "accessControl": {
             "embed": {
