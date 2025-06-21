@@ -8,6 +8,7 @@ import tempfile
 import os
 from datetime import datetime
 import argparse
+import numpy as np
 
 def log_print(level, message):
     print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} [{level}] {message}")
@@ -53,10 +54,21 @@ def change_audio_speed(input_buffer, speed_factor=1.0):
                     y_stretched = librosa.util.fix_length(y, size=new_length)
                     log_print("INFO", "Audio stretching completed using simple resampling")
             
+            # Normalize and boost audio volume
+            log_print("INFO", "Normalizing and boosting audio volume")
+            # Normalize to prevent clipping
+            y_normalized = librosa.util.normalize(y_stretched)
+            # Boost volume by multiplying by a factor (adjust this value as needed)
+            volume_boost = 2.0  # Increase this value to make audio louder
+            y_boosted = y_normalized * volume_boost
+            # Clip to prevent distortion
+            y_boosted = np.clip(y_boosted, -1.0, 1.0)
+            log_print("INFO", f"Audio volume boosted by {volume_boost}x factor")
+            
             # Save to bytes buffer instead of file
             log_print("INFO", "Converting stretched audio to buffer")
             audio_buffer = io.BytesIO()
-            sf.write(audio_buffer, y_stretched, sr, format='WAV')
+            sf.write(audio_buffer, y_boosted, sr, format='WAV')
             audio_buffer.seek(0)
             
             buffer_size = len(audio_buffer.getvalue())
