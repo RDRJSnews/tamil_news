@@ -28,7 +28,7 @@ def log_print(level, message):
 log_print("INFO", "=== Starting YouTube Upload Process ===")
 log_print("INFO", "Generating video metadata with Gemini AI")
 
-def generate_title_description_tags(lang_code):
+def generate_title_description_tags(lang_code, news_text=None):
     try:
         lang_list = ['ta', 'en-in', 'hi']
         if lang_code == 0:
@@ -44,12 +44,12 @@ def generate_title_description_tags(lang_code):
         log_print("INFO", f"Generated title: {TITLE}")
         
         DESCRIPTION = get_gemini_response(f'''Give a best cautchy attractive formatted with oneline space youtube description,
-    with 50 trending # tags in description like #tag1,... , for {TITLE}. Use my channel link https://www.youtube.com/@rdrjsethurajan and the playlist link https://www.youtube.com/playlist?list={PLAYLIST_ID}''')
+    with 50 trending # tags in description like #tag1,... , for {TITLE}. In the description include the exact news text = {news_text}. Use my channel link https://www.youtube.com/@rdrjsethurajan and the playlist link https://www.youtube.com/playlist?list={PLAYLIST_ID}''')
         log_print("INFO", f"Generated description length: {len(DESCRIPTION)} characters")
         log_print("INFO", f"Generated description: {DESCRIPTION}")
         
         # Focused set of relevant tags (staying within YouTube's 500 character limit)
-        TAGS = get_gemini_response(f'''Give a best trending viral youtube tags formatted like ["tag1", "tag2", ...] for {TITLE}.
+        TAGS = get_gemini_response(f'''Give a best trending viral youtube tags only in English, formatted like ["tag1", "tag2", ...] for {TITLE}.
     Give only tags content no extra text. Note that the sum of all tag length that is len(tag1)+len(tag2)+...etc. should be less than 500''')
         log_print("INFO", f"Generated tags: {TAGS}")
         
@@ -291,8 +291,6 @@ if __name__ == "__main__":
         lang_map = {'ta': 0, 'en-in': 1, 'hi': 2}
         lang_code = lang_map.get(args.lang, 0)
 
-        TITLE, DESCRIPTION, TAGS = generate_title_description_tags(lang_code)
-
         # Determine the video file name based on language
         video_file_map = {
             'ta': 'output_video.mp4',
@@ -300,6 +298,28 @@ if __name__ == "__main__":
             'hi': 'output_video_2.mp4'
         }
         video_path = video_file_map.get(args.lang, 'output_video.mp4')
+
+        # Determine the news text file name based on language
+        text_file_map = {
+            'ta': 'news_text_ta_output.txt',
+            'en-in': 'news_text_en_output.txt',
+            'hi': 'news_text_hi_output.txt'
+        }
+        text_path = text_file_map.get(args.lang, 'news_text_output.txt')
+
+        # Read news text if available
+        news_text = None
+        if os.path.exists(text_path):
+            try:
+                with open(text_path, 'r', encoding='utf-8') as f:
+                    news_text = f.read()
+                log_print("INFO", f"News text loaded from {text_path}")
+            except Exception as e:
+                log_print("WARNING", f"Could not read news text from {text_path}: {str(e)}")
+        else:
+            log_print("WARNING", f"News text file {text_path} not found, will generate metadata without context")
+
+        TITLE, DESCRIPTION, TAGS = generate_title_description_tags(lang_code, news_text)
 
         if not os.path.exists(video_path):
             log_print("ERROR", f"Video file {video_path} does not exist!")
