@@ -149,7 +149,9 @@ def repeat_video_to_match_audio(video_path, audio_buffer):
                 codec='libx264',
                 audio_codec='aac',
                 fps=video.fps,
-                verbose=False
+                verbose=False,
+                bitrate='1000k',  # Reduce bitrate for smaller file size
+                preset='fast'     # Use fast encoding preset
             )
 
             # Read the file into a buffer
