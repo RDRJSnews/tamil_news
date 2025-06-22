@@ -64,7 +64,7 @@ def main(lang_code):
         audio_buffer = news_reader(news_text, lang)
         
         log_print("INFO", "=== News Audio Generation Completed Successfully ===")
-        return audio_buffer
+        return news_text, audio_buffer
         
     except Exception as e:
         log_print("ERROR", f"Error in main audio generation process: {str(e)}")
