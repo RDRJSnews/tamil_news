@@ -51,7 +51,7 @@ def generate_title_description_tags(lang_code, news_text=None):
         
         # Focused set of relevant tags (staying within YouTube's 500 character limit)
         TAGS = get_gemini_response(f'''Give a best trending viral youtube tags only in English, formatted like ["tag1", "tag2", ...] for {TITLE}.
-    Give only tags content no extra text. Note that the sum of all tag length that is len(tag1)+len(tag2)+...etc. should be less than 500''')
+    Give only tags content no extra text. Note that the sum of all tag length that is len(tag1)+len(tag2)+...etc. should be less than 400''')
         log_print("INFO", f"Generated tags: {TAGS}")
         
     except Exception as e:
