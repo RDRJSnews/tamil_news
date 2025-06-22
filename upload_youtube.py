@@ -13,6 +13,7 @@ import tempfile
 from datetime import datetime
 import ast
 import argparse
+import time
 
 # Add playlist modification scope
 SCOPES = [
@@ -246,11 +247,33 @@ def upload_video(youtube, TITLE, DESCRIPTION, TAGS, PLAYLIST_ID, video_buffer):
 
         log_print("INFO", "Starting upload process")
         response = None 
+        last_progress = 0
+        start_time = time.time()
+        
         while response is None:
-            status, response = request.next_chunk()
-            if status:
-                progress = int(status.progress()*100)
-                log_print("INFO", f"Upload progress: {progress}%")
+            try:
+                status, response = request.next_chunk()
+                if status:
+                    progress = int(status.progress()*100)
+                    current_time = time.time()
+                    elapsed_time = current_time - start_time
+                    
+                    # Log progress every 10% or every 30 seconds
+                    if progress > last_progress + 9 or elapsed_time > 30:
+                        log_print("INFO", f"Upload progress: {progress}% (elapsed: {elapsed_time:.1f}s)")
+                        last_progress = progress
+                        start_time = current_time  # Reset timer
+                    
+                    # Check for timeout (15 minutes)
+                    if elapsed_time > 900:  # 15 minutes
+                        log_print("ERROR", "Upload timeout after 15 minutes")
+                        raise Exception("Upload timeout - taking too long")
+                        
+            except Exception as e:
+                log_print("ERROR", f"Upload error: {str(e)}")
+                # Wait a bit and retry
+                time.sleep(5)
+                continue
 
         video_id = response['id']
         log_print("INFO", f"Video uploaded successfully with ID: {video_id}")
