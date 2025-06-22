@@ -25,6 +25,7 @@ on:
 jobs:
   run-news:
     runs-on: ubuntu-latest
+    timeout-minutes: 30  # Add 30-minute timeout
     
     env:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -69,6 +70,7 @@ jobs:
           echo "${{ secrets.YOUTUBE_TOKEN_BASE64 }}" | base64 -d > youtube_token.pickle
 
       - name: Run news workflows
+        timeout-minutes: 25  # Add timeout for upload steps
         run: |
           if [[ "$LANGUAGE" == "all" || "$LANGUAGE" == "ta" ]]; then
             echo "Running news_video.py for Tamil"
