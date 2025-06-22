@@ -105,7 +105,7 @@ def repeat_video_to_match_audio(video_path, audio_buffer):
         
         try:
             log_print("INFO", "Loading audio file with MoviePy")
-            audio = AudioFileClip(temp_audio_path)  # MoviePy still needs FFmpeg here, but only for reading
+            audio = AudioFileClip(temp_audio_path)
             log_print("INFO", f"Audio loaded successfully. Duration: {audio.duration:.2f}s")
             
             # Get durations
@@ -114,33 +114,32 @@ def repeat_video_to_match_audio(video_path, audio_buffer):
             
             log_print("INFO", f"Video duration: {video_duration:.2f}s")
             log_print("INFO", f"Audio duration: {audio_duration:.2f}s")
-            log_print("INFO", f"Using audio file: {temp_audio_path}")
             
-            # Calculate how many times we need to repeat the video
-            num_repeats = math.ceil(audio_duration / video_duration)
-            log_print("INFO", f"Number of video repeats needed: {num_repeats}")
+            # More efficient approach: create a single looped video
+            log_print("INFO", "Creating efficient video loop")
             
-            # Create a list of repeated video clips
-            log_print("INFO", "Creating repeated video clips")
-            repeated_clips = [video] * num_repeats
+            # Calculate how many complete loops we need
+            num_complete_loops = int(audio_duration // video_duration)
+            remaining_duration = audio_duration % video_duration
             
-            # Concatenate all the clips
-            log_print("INFO", "Concatenating video clips")
-            final_video = concatenate_videoclips(repeated_clips)
-            log_print("INFO", f"Video concatenation completed. Duration: {final_video.duration:.2f}s")
+            if num_complete_loops > 0:
+                # Create a looped video using a more efficient method
+                from moviepy.video.fx import loop
+                looped_video = video.loop(duration=audio_duration)
+            else:
+                # If audio is shorter than video, just trim the video
+                looped_video = video.subclip(0, audio_duration)
             
-            # Set the audio of the final video
-            log_print("INFO", "Setting audio to final video")
-            final_video = final_video.set_audio(audio)
+            log_print("INFO", f"Video loop created. Duration: {looped_video.duration:.2f}s")
             
-            # Trim the video to exactly match the audio duration
-            log_print("INFO", "Trimming video to match audio duration")
-            final_video = final_video.subclip(0, audio_duration)
+            # Set the audio
+            log_print("INFO", "Setting audio to video")
+            final_video = looped_video.set_audio(audio)
             
             log_print("INFO", f"Final video duration: {final_video.duration:.2f}s")
             
-            # Write to a temporary file instead of buffer
-            log_print("INFO", "Writing final video to temporary file")
+            # Write to a temporary file with optimized settings
+            log_print("INFO", "Writing final video with optimized settings")
             with tempfile.NamedTemporaryFile(suffix='.mp4', delete=False) as temp_video_file:
                 temp_video_path = temp_video_file.name
 
@@ -150,8 +149,10 @@ def repeat_video_to_match_audio(video_path, audio_buffer):
                 audio_codec='aac',
                 fps=video.fps,
                 verbose=False,
-                bitrate='1000k',  # Reduce bitrate for smaller file size
-                preset='fast'     # Use fast encoding preset
+                bitrate='800k',      # Further reduce bitrate
+                preset='ultrafast',   # Use fastest encoding preset
+                threads=2,           # Use multiple threads
+                ffmpeg_params=['-crf', '28']  # Higher CRF for faster encoding
             )
 
             # Read the file into a buffer
@@ -196,7 +197,7 @@ def main(lang_code=0):
 
         log_print("INFO", "Audio buffer received successfully")
 
-        speed = 1.25  # 1.25x speed (reduced from 1.5x to minimize volume loss)
+        speed = 1.5  # 1.25x speed (reduced from 1.5x to minimize volume loss)
         log_print("INFO", f"Applying speed factor: {speed}x")
 
         log_print("INFO", "Processing audio speed change")
