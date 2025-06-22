@@ -186,7 +186,7 @@ def main(lang_code=0):
         log_print("INFO", f"Using template video: {video_path}")
 
         log_print("INFO", f"Calling news_audio_main to generate audio (lang_code={lang_code})")
-        audio_buffer = news_audio_main(lang_code) # 0 for Tamil, 1 for English
+        news_text, audio_buffer = news_audio_main(lang_code) # 0 for Tamil, 1 for English
 
         if not audio_buffer:
             log_print("ERROR", "No audio buffer received from news_audio_main")
@@ -194,7 +194,7 @@ def main(lang_code=0):
 
         log_print("INFO", "Audio buffer received successfully")
 
-        speed = 1.5  # 1.5x speed (change this value as needed)
+        speed = 1.25  # 1.25x speed (reduced from 1.5x to minimize volume loss)
         log_print("INFO", f"Applying speed factor: {speed}x")
 
         log_print("INFO", "Processing audio speed change")
@@ -204,7 +204,7 @@ def main(lang_code=0):
         final_video_buffer = repeat_video_to_match_audio(video_path, audio_speeded_buffer)
 
         log_print("INFO", "=== News Video Generation Completed Successfully ===")
-        return final_video_buffer
+        return news_text, final_video_buffer
 
     except Exception as e:
         log_print("ERROR", f"Error in main video generation process: {str(e)}")
@@ -217,17 +217,26 @@ if __name__ == "__main__":
     lang_map = {'ta': 0, 'en-in': 1, 'hi': 2}
     lang_code = lang_map.get(args.lang, 0)
     try:
-        video_buffer = main(lang_code=lang_code)
-        if not video_buffer:
+        news_text, final_video_buffer = main(lang_code=lang_code)
+        if not final_video_buffer:
             log_print("ERROR", "No video data generated!")
             exit(1)
         log_print("INFO", "Video generated successfully!")
+        
         # Save the video buffer to the correct file
         output_map = {0: "output_video.mp4", 1: "output_video_1.mp4", 2: "output_video_2.mp4"}
         output_file = output_map.get(lang_code, "output_video.mp4")
         with open(output_file, "wb") as f:
-            f.write(video_buffer.getbuffer())
+            f.write(final_video_buffer.getbuffer())
         log_print("INFO", f"Video saved to {output_file}")
+        
+        # Save the news text to the correct file
+        text_map = {0: "news_text_ta_output.txt", 1: "news_text_en_output.txt", 2: "news_text_hi_output.txt"}
+        text_file = text_map.get(lang_code, "news_text_output.txt")
+        with open(text_file, "w", encoding="utf-8") as f:
+            f.write(news_text)
+        log_print("INFO", f"News text saved to {text_file}")
+        
     except Exception as e:
         log_print("ERROR", f"An error occurred in the video generation workflow: {str(e)}")
         raise
