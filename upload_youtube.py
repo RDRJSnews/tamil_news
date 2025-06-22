@@ -76,21 +76,23 @@ def generate_title_description_tags(lang_code, news_text=None):
         current_count = 0
         for s in strings_list:
             s = s.strip()
-            if not s or len(s) > 10:
+            if not s or len(s) > 30:  # allow longer tags if needed
                 continue  # skip empty or too-long tags
             if current_count + len(s) <= max_chars:
                 sublist.append(s)
                 current_count += len(s)
-                print(current_count, '\n')
             else:
                 break
-        return str(sublist)  # return as str(sublist)
+        return sublist  # return as a real list
 
     # Safely convert to list if TAGS is a string
     if isinstance(TAGS, str):
         TAGS = ast.literal_eval(TAGS)
     # Focused set of relevant tags (staying within YouTube's 500 character limit)
     TAGS = get_tags_within_limit(TAGS, 499)
+    # Ensure TAGS is a list
+    if not isinstance(TAGS, list):
+        TAGS = list(TAGS)
     print("INFO", f"Generated tags within limit: {TAGS}")
     print("INFO", f"Type of TAGS: {type(TAGS)}")
 
