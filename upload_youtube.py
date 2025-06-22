@@ -29,6 +29,16 @@ def log_print(level, message):
 log_print("INFO", "=== Starting YouTube Upload Process ===")
 log_print("INFO", "Generating video metadata with Gemini AI")
 
+# Simple in-memory cache for Gemini API responses
+_gemini_cache = {}
+def get_gemini_response_cached(prompt):
+    if prompt in _gemini_cache:
+        log_print("INFO", "Using cached Gemini API response.")
+        return _gemini_cache[prompt]
+    result = get_gemini_response(prompt)
+    _gemini_cache[prompt] = result
+    return result
+
 def generate_title_description_tags(lang_code, news_text=None):
     try:
         lang_list = ['ta', 'en-in', 'hi']
@@ -41,17 +51,17 @@ def generate_title_description_tags(lang_code, news_text=None):
         else:
             raise ValueError(f"Invalid language code: {lang_code}. Valid range: 0-{len(lang_list)-1}")
 
-        TITLE = get_gemini_response(f'''Give one best cautchy attractive youtube title on today's top India national news in {language}. Give only one title content no extra text. Include emojies.''')
+        TITLE = get_gemini_response_cached(f'''Give one best cautchy attractive youtube title on today's top India national news in {language}. Give only one title content no extra text. Include emojies.''')
         log_print("INFO", f"Generated title: {TITLE}")
         
-        DESCRIPTION = get_gemini_response(f'''Give a best cautchy attractive formatted with oneline space youtube description,
+        DESCRIPTION = get_gemini_response_cached(f'''Give a best cautchy attractive formatted with oneline space youtube description,
     with 50 trending # tags in description like #tag1,... , for {TITLE}. In the description include the exact news text = {news_text}. Use my channel link https://www.youtube.com/@rdrjsethurajan and the playlist link https://www.youtube.com/playlist?list={PLAYLIST_ID}''')
         log_print("INFO", f"Generated description length: {len(DESCRIPTION)} characters")
         log_print("INFO", f"Generated description: {DESCRIPTION}")
         
         # Focused set of relevant tags (staying within YouTube's 500 character limit)
-        TAGS = get_gemini_response(f'''Give a best trending viral youtube tags only in English, formatted like ["tag1", "tag2", ...] for {TITLE}.
-    Give only tags content no extra text. Note that the sum of all tag length that is len(tag1)+len(tag2)+...etc. should be less than 400''')
+        TAGS = get_gemini_response_cached(f'''Give a best trending viral youtube tags only in English, formatted like ["tag1", "tag2", ...] for {TITLE}.
+    Give only tags content no extra text. Note that the sum of all tag length that is len(tag1)+len(tag2)+...etc. should be less than 500''')
         log_print("INFO", f"Generated tags: {TAGS}")
         
     except Exception as e:
@@ -249,7 +259,11 @@ def upload_video(youtube, TITLE, DESCRIPTION, TAGS, PLAYLIST_ID, video_buffer):
         response = None 
         last_progress = 0
         start_time = time.time()
+        retry_count = 0
+        max_retries = 5
+        backoff = 5  # seconds
         
+        from googleapiclient.errors import HttpError
         while response is None:
             try:
                 status, response = request.next_chunk()
@@ -257,22 +271,35 @@ def upload_video(youtube, TITLE, DESCRIPTION, TAGS, PLAYLIST_ID, video_buffer):
                     progress = int(status.progress()*100)
                     current_time = time.time()
                     elapsed_time = current_time - start_time
-                    
                     # Log progress every 10% or every 30 seconds
                     if progress > last_progress + 9 or elapsed_time > 30:
                         log_print("INFO", f"Upload progress: {progress}% (elapsed: {elapsed_time:.1f}s)")
                         last_progress = progress
                         start_time = current_time  # Reset timer
-                    
                     # Check for timeout (15 minutes)
                     if elapsed_time > 900:  # 15 minutes
                         log_print("ERROR", "Upload timeout after 15 minutes")
                         raise Exception("Upload timeout - taking too long")
-                        
+            except HttpError as e:
+                if e.resp.status == 403 and 'quotaExceeded' in str(e):
+                    log_print("ERROR", "Quota exceeded. Stopping further retries.")
+                    raise
+                retry_count += 1
+                if retry_count > max_retries:
+                    log_print("ERROR", f"Max retries ({max_retries}) reached. Giving up.")
+                    raise
+                log_print("ERROR", f"Upload error: {str(e)}. Retrying in {backoff} seconds (attempt {retry_count}/{max_retries})...")
+                time.sleep(backoff)
+                backoff = min(backoff * 2, 300)  # Exponential backoff, max 5 min
+                continue
             except Exception as e:
-                log_print("ERROR", f"Upload error: {str(e)}")
-                # Wait a bit and retry
-                time.sleep(5)
+                retry_count += 1
+                if retry_count > max_retries:
+                    log_print("ERROR", f"Max retries ({max_retries}) reached. Giving up.")
+                    raise
+                log_print("ERROR", f"Upload error: {str(e)}. Retrying in {backoff} seconds (attempt {retry_count}/{max_retries})...")
+                time.sleep(backoff)
+                backoff = min(backoff * 2, 300)
                 continue
 
         video_id = response['id']
