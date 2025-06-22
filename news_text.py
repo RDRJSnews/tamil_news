@@ -2,11 +2,13 @@ import google.generativeai as genai
 import textwrap
 import os
 from datetime import datetime
+import time
+import random
 
 def log_print(level, message):
     print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} [{level}] {message}")
 
-prompt_en = """TL;DR: Generate today's National news summaries in English language.
+prompt_en = f"""TL;DR: Generate today's "{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}" National news summaries in English language.
 
 Requirements and rules:
 1. Always the first line with be "Today's National News:"
@@ -23,7 +25,7 @@ Requirements and rules:
 
 Please proceed with generating the news summaries."""
 
-prompt_ta = """TL;DR: Generate today's National news summaries in Tamil language.
+prompt_ta = f"""TL;DR: Generate today's "{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}" National news summaries in Tamil language.
 
 Requirements and rules:
 1. Always the first line with be 'இன்றைய தேசிய செய்திகள்:'
@@ -40,7 +42,7 @@ Requirements and rules:
 
 Please proceed with generating the news summaries."""
 
-prompt_hi = """TL;DR: Generate today's National news summaries in Hindi language.
+prompt_hi = f"""TL;DR: Generate today's "{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}" National news summaries in Hindi language.
 
 Requirements and rules:
 1. Always the first line with be 'आज की राष्ट्रीय खबरें:'
@@ -83,7 +85,7 @@ def setup_model():
     """Set up the Gemini model with optimized parameters."""
     log_print("INFO", "Setting up Gemini model with optimized parameters")
     generation_config = {
-        "temperature": 0.7,  # Controls randomness (0.0 to 1.0)
+        "temperature": 0.9,  # Increased randomness (0.0 to 1.0) - was 0.7
         "top_p": 0.9,       # Nucleus sampling parameter
         "top_k": 40,        # Top-k sampling parameter
         "max_output_tokens": 2048,  # Maximum length of response
@@ -196,19 +198,24 @@ def main(lang):
     log_print("INFO", "=== Starting News Text Generation Process ===")
     log_print("INFO", f"Selected language: {lang}")
 
+    # Add unique timestamp and random elements to prevent caching
+    timestamp = int(time.time())
+    random_seed = random.randint(1000, 9999)
+    
     if lang == 'en-in':
-        prompt = prompt_en
+        prompt = prompt_en + f"\n\nUnique identifier: {timestamp}-{random_seed}-EN"
         log_print("INFO", "Using English prompt")
     elif lang == 'ta':
-        prompt = prompt_ta
+        prompt = prompt_ta + f"\n\nUnique identifier: {timestamp}-{random_seed}-TA"
         log_print("INFO", "Using Tamil prompt")
     elif lang == 'hi':
-        prompt = prompt_hi
+        prompt = prompt_hi + f"\n\nUnique identifier: {timestamp}-{random_seed}-HI"
         log_print("INFO", "Using Hindi prompt")
     else:
         log_print("ERROR", f"Unsupported language: {lang}")
         raise ValueError(f"Unsupported language: {lang}")
     
+    log_print("INFO", f"Generated unique prompt with timestamp: {timestamp}, seed: {random_seed}")
     log_print("INFO", "Generating news content with Gemini AI...")
     response = get_gemini_response(prompt)
     
