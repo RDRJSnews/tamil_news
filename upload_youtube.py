@@ -59,9 +59,9 @@ def generate_title_description_tags(lang_code, news_text=None):
         log_print("INFO", f"Generated description length: {len(DESCRIPTION)} characters")
         log_print("INFO", f"Generated description: {DESCRIPTION}")
         
-        # Focused set of relevant tags (staying within YouTube's 500 character limit)
+        # Focused set of relevant tags (staying within 400 character limit)
         TAGS = get_gemini_response_cached(f'''Give a best trending viral youtube tags only in English, formatted like ["tag1", "tag2", ...] for {TITLE}.
-    Give only tags content no extra text. Note that the sum of all tag length that is len(tag1)+len(tag2)+...etc. should be less than 500''')
+    Give only tags content no extra text. Note that the sum of all tag length that is len(tag1)+len(tag2)+...etc. should be less than 400''')
         log_print("INFO", f"Generated tags: {TAGS}")
         
     except Exception as e:
@@ -71,7 +71,7 @@ def generate_title_description_tags(lang_code, news_text=None):
         DESCRIPTION = "Stay updated with the latest national news from India. #India #News #National #Updates"
         TAGS = ["India", "News", "National", "Updates", "Latest"]
 
-    def get_tags_within_limit(strings_list, max_chars=499):
+    def get_tags_within_limit(strings_list, max_chars=400):
         sublist = []
         current_count = 0
         for s in strings_list:
@@ -88,8 +88,8 @@ def generate_title_description_tags(lang_code, news_text=None):
     # Safely convert to list if TAGS is a string
     if isinstance(TAGS, str):
         TAGS = ast.literal_eval(TAGS)
-    # Focused set of relevant tags (staying within YouTube's 500 character limit)
-    TAGS = get_tags_within_limit(TAGS, 499)
+    # Focused set of relevant tags (staying within 400 character limit)
+    TAGS = get_tags_within_limit(TAGS, 400)
     # Ensure TAGS is a list
     if not isinstance(TAGS, list):
         TAGS = list(TAGS)
