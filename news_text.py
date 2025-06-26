@@ -197,25 +197,20 @@ def get_gemini_response(prompt):
 def main(lang):
     log_print("INFO", "=== Starting News Text Generation Process ===")
     log_print("INFO", f"Selected language: {lang}")
-
-    # Add unique timestamp and random elements to prevent caching
-    timestamp = int(time.time())
-    random_seed = random.randint(1000, 9999)
     
     if lang == 'en-in':
-        prompt = prompt_en + f"\n\nUnique identifier: {timestamp}-{random_seed}-EN"
+        prompt = prompt_en
         log_print("INFO", "Using English prompt")
     elif lang == 'ta':
-        prompt = prompt_ta + f"\n\nUnique identifier: {timestamp}-{random_seed}-TA"
+        prompt = prompt_ta
         log_print("INFO", "Using Tamil prompt")
     elif lang == 'hi':
-        prompt = prompt_hi + f"\n\nUnique identifier: {timestamp}-{random_seed}-HI"
+        prompt = prompt_hi
         log_print("INFO", "Using Hindi prompt")
     else:
         log_print("ERROR", f"Unsupported language: {lang}")
         raise ValueError(f"Unsupported language: {lang}")
     
-    log_print("INFO", f"Generated unique prompt with timestamp: {timestamp}, seed: {random_seed}")
     log_print("INFO", "Generating news content with Gemini AI...")
     response = get_gemini_response(prompt)
     
