@@ -164,17 +164,16 @@ def authenticate_youtube():
             log_print("INFO", "Please follow the browser prompts to sign in.")
             log_print("INFO", "Make sure to check 'Keep me signed in' if prompted.")
             
-            credentials = flow.run_local_server(
-                port=8080,
-                prompt='consent',  # Force consent screen to ensure we get refresh token
-                authorization_prompt_message='Please authorize the application to access your YouTube account'
+            # Use run_console instead of run_local_server for headless environments
+            credentials = flow.run_console(
+                prompt='consent'
             )
             
             # Verify we have a refresh token
             if not credentials.refresh_token:
                 log_print("ERROR", "No refresh token received")
                 raise Exception("No refresh token received. Please try again and make sure to grant all requested permissions.")
-                
+            
             log_print("INFO", "Successfully obtained credentials with refresh token")
             
             # Save the complete credentials
