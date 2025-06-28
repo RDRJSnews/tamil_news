@@ -24,6 +24,7 @@ def get_prompt_en():
     return f"""TL;DR: Generate {selected_variation} in English language (request #{random_seed}).
 
 Requirements and rules:
+0. Do not use any catch news that you havee already generated in the previous request, do not repeat the same news, do not use the same news in the same request, delete and forget the previous news, and completely generate new news.
 1. Always the first line with be "Today's National News:"
 2. Generate each news with a suitable title then : followed by the respective news summay
 3. Do not use commas in numbers (e.g., use ₹14588 instead of ₹14,588)
