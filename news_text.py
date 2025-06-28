@@ -9,7 +9,19 @@ def log_print(level, message):
     print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} [{level}] {message}")
 
 def get_prompt_en():
-    return f"""TL;DR: Generate today's "{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}" National news summaries in English language.
+    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    random_seed = random.randint(1, 10000)
+    time_variations = [
+        f"latest breaking news as of {current_time}",
+        f"current national headlines for {current_date}",
+        f"today's top stories updated at {current_time}",
+        f"breaking national news for {current_date}",
+        f"latest developments as of {current_time}"
+    ]
+    selected_variation = random.choice(time_variations)
+    
+    return f"""TL;DR: Generate {selected_variation} in English language (request #{random_seed}).
 
 Requirements and rules:
 1. Always the first line with be "Today's National News:"
@@ -23,11 +35,24 @@ Requirements and rules:
 9. Always the last line will be 'For more Daily News, do like, share, subscribe and comment .'
 10. Do not use any other text or comments before or after the news summaries.
 11. Generate 15 most important and priority news.
+12. Focus on DIFFERENT news stories than previous requests - avoid repetition.
 
 Please proceed with generating the news summaries."""
 
 def get_prompt_ta():
-    return f"""TL;DR: Generate today's "{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}" National news summaries in Tamil language.
+    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    random_seed = random.randint(1, 10000)
+    time_variations = [
+        f"சமீபத்திய செய்திகள் {current_time} நேரத்தில்",
+        f"தற்போதைய தேசிய செய்திகள் {current_date} க்கான",
+        f"இன்றைய முக்கிய செய்திகள் {current_time} புதுப்பிக்கப்பட்டது",
+        f"சமீபத்திய முன்னேற்றங்கள் {current_time} நேரத்தில்",
+        f"தற்போதைய முக்கிய செய்திகள் {current_date} க்கான"
+    ]
+    selected_variation = random.choice(time_variations)
+    
+    return f"""TL;DR: Generate {selected_variation} in Tamil language (request #{random_seed}).
 
 Requirements and rules:
 1. Always the first line with be 'இன்றைய தேசிய செய்திகள்:'
@@ -41,11 +66,24 @@ Requirements and rules:
 9. Always the last line will be 'இது போல தினசரி செய்திகள் தெரிந்துகொள்ள like, share, subscribe மற்றும் comment செய்யுங்கள்.'
 10. Do not use any other text or comments before or after the news summaries.
 11. Generate 15 most important and priority news.
+12. Focus on DIFFERENT news stories than previous requests - avoid repetition.
 
 Please proceed with generating the news summaries."""
 
 def get_prompt_hi():
-    return f"""TL;DR: Generate today's "{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}" National news summaries in Hindi language.
+    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    random_seed = random.randint(1, 10000)
+    time_variations = [
+        f"latest breaking news as of {current_time}",
+        f"current national headlines for {current_date}",
+        f"today's top stories updated at {current_time}",
+        f"breaking national news for {current_date}",
+        f"latest developments as of {current_time}"
+    ]
+    selected_variation = random.choice(time_variations)
+    
+    return f"""TL;DR: Generate {selected_variation} in Hindi language (request #{random_seed}).
 
 Requirements and rules:
 1. Always the first line with be 'आज की राष्ट्रीय खबरें:'
@@ -59,6 +97,7 @@ Requirements and rules:
 9. Always the last line will be 'ऐसे ही दैनिक समाचार जानने के लिए like, share, subscribe और comment इसे करें.'
 10. Do not use any other text or comments before or after the news summaries.
 11. Generate 15 most important and priority news.
+12. Focus on DIFFERENT news stories than previous requests - avoid repetition.
 
 Please proceed with generating the news summaries."""
 
@@ -87,12 +126,20 @@ def list_available_models():
 def setup_model():
     """Set up the Gemini model with optimized parameters."""
     log_print("INFO", "Setting up Gemini model with optimized parameters")
+    
+    # Add more randomness to ensure different responses
+    temperature = random.uniform(0.8, 1.0)  # Random temperature between 0.8-1.0
+    top_p = random.uniform(0.8, 0.95)      # Random top_p between 0.8-0.95
+    top_k = random.randint(30, 50)         # Random top_k between 30-50
+    
     generation_config = {
-        "temperature": 0.9,  # Increased randomness (0.0 to 1.0) - was 0.7
-        "top_p": 0.9,       # Nucleus sampling parameter
-        "top_k": 40,        # Top-k sampling parameter
+        "temperature": temperature,  # Increased randomness (0.0 to 1.0)
+        "top_p": top_p,            # Nucleus sampling parameter
+        "top_k": top_k,            # Top-k sampling parameter
         "max_output_tokens": 2048,  # Maximum length of response
     }
+    
+    log_print("INFO", f"Using temperature: {temperature:.2f}, top_p: {top_p:.2f}, top_k: {top_k}")
     
     safety_settings = [
         {
