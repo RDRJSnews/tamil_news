@@ -8,7 +8,8 @@ import random
 def log_print(level, message):
     print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} [{level}] {message}")
 
-prompt_en = f"""TL;DR: Generate today's "{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}" National news summaries in English language.
+def get_prompt_en():
+    return f"""TL;DR: Generate today's "{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}" National news summaries in English language.
 
 Requirements and rules:
 1. Always the first line with be "Today's National News:"
@@ -25,7 +26,8 @@ Requirements and rules:
 
 Please proceed with generating the news summaries."""
 
-prompt_ta = f"""TL;DR: Generate today's "{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}" National news summaries in Tamil language.
+def get_prompt_ta():
+    return f"""TL;DR: Generate today's "{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}" National news summaries in Tamil language.
 
 Requirements and rules:
 1. Always the first line with be 'இன்றைய தேசிய செய்திகள்:'
@@ -42,7 +44,8 @@ Requirements and rules:
 
 Please proceed with generating the news summaries."""
 
-prompt_hi = f"""TL;DR: Generate today's "{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}" National news summaries in Hindi language.
+def get_prompt_hi():
+    return f"""TL;DR: Generate today's "{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}" National news summaries in Hindi language.
 
 Requirements and rules:
 1. Always the first line with be 'आज की राष्ट्रीय खबरें:'
@@ -199,13 +202,13 @@ def main(lang):
     log_print("INFO", f"Selected language: {lang}")
     
     if lang == 'en-in':
-        prompt = prompt_en
+        prompt = get_prompt_en()
         log_print("INFO", "Using English prompt")
     elif lang == 'ta':
-        prompt = prompt_ta
+        prompt = get_prompt_ta()
         log_print("INFO", "Using Tamil prompt")
     elif lang == 'hi':
-        prompt = prompt_hi
+        prompt = get_prompt_hi()
         log_print("INFO", "Using Hindi prompt")
     else:
         log_print("ERROR", f"Unsupported language: {lang}")
